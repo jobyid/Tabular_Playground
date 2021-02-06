@@ -26,8 +26,10 @@ def num_plots():
 
         ax[1].set(xlabel="id", ylabel=i)
         ax[1].set_title("test_data")
-
+        name ="./plots/" + i + "numplot.png"
+        plt.savefig(name)
         plt.show()
+
 
 
 def num_hist_plot():
@@ -42,8 +44,10 @@ def num_hist_plot():
         ax[1].set(xlabel='id', ylabel=i)
         ax[1].set_title("test_data")
         sns.distplot(a=test_data[i], ax=ax[1])
+        name ="./plots/" + i + "num_hist_plot.png"
+        plt.savefig(name)
         plt.show()
-
+num_hist_plot()
 
 def feature_vs_target_plots():
     global i, fig
@@ -51,8 +55,11 @@ def feature_vs_target_plots():
         fig = plt.figure(figsize=(10, 6))
         plt.plot(train_data[i], train_data["target"], linestyle='', marker='x')
         plt.title(i)
+        name ="./plots/" +  i + "feature_vs_target_plot.png"
+        plt.savefig(name)
         plt.show()
 
+feature_vs_target_plots()
 
 def outliers():
     outlier = train_data.loc[train_data.target < 1.0]
@@ -77,19 +84,26 @@ def cat_bar_plots():
         ax[1].set(xlabel='id', ylabel=i)
         ax[1].set_title("test_data")
         test_data[i].value_counts().plot(kind='bar', ax=ax[1])
-
+        name ="./plots/" + i + "cat_bar_plot.png"
+        plt.savefig(name)
         plt.show()
 
 
+cat_bar_plots()
 def cat_catplots():
     global i
     for i in cat_features:
         sns.catplot(x=i, y="target", data=train_data)
+        name ="./plots/" + i + "cat_plot.png"
+        plt.savefig(name)
         plt.show()
-
+cat_catplots()
 y_train = train_data["target"]
 train_data.drop(columns=['target'], inplace=True)
 test_data_backup = test_data.copy()
+# dropping the id column slightly improves the score
+train_data.drop(columns=["id"], inplace=True)
+test_data.drop(columns=["id"], inplace=True)
 
 def save_solution(y_pred):
     solution = pd.DataFrame({"id": test_data_backup.id, "target": y_pred})
@@ -99,9 +113,6 @@ def save_solution(y_pred):
 
 def train_catboost():
     categorical_features = cat_features
-    # dropping the id column slightly improves the score
-    train_data.drop(columns=["id"], inplace=True)
-    test_data.drop(columns=["id"], inplace=True)
     model_ctb = CatBoostRegressor(iterations=3000, learning_rate=0.02, od_type='Iter', loss_function='RMSE',  # eval_metric='AUC',
                                   grow_policy='SymmetricTree',  # auto_class_weights = 'Balanced',
                                   # max_depth = 8,
@@ -116,7 +127,7 @@ def train_catboost():
     save_solution(y_pred)
     print(y_pred)
 
-train_catboost()
+
 
 
 
